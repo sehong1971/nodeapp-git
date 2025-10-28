@@ -1,0 +1,43 @@
+def IMAGE_VERSION
+def ECR_REGISTRY = "242337484181.dkr.ecr.ap-northeast-2.amazonaws.com"
+def ECR_REPO = "${ECR_REGISTRY}/nodeapp00"
+
+pipeline {
+	agent any
+	stages {
+        stage("Checkout") {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Docker Build') {
+            agent any
+            steps {
+                script {
+					IMAGE_VERSION = sh(script: "head -n 1 Dockerfile | sed 's/#//'", returnStdout: true).trim()
+                    echo "${env.IMAGE_REPO}:${IMAGE_VERSION}"
+                    app1 = docker.build("${env.IMAGE_REPO}")
+                    echo "${ECR_REPO}:${IMAGE_VERSION}"
+                    app2 = docker.build("${ECR_REPO}")
+                }
+            }
+        }
+        stage('Push Image') {
+            agent any
+            steps {
+                script {
+                    echo "push docker hub"
+                    docker.withRegistry("https://registry.hub.docker.com/${env.IMAGE_REPO}", "dockerhub-cred") {            
+                        app1.push(IMAGE_VERSION)
+                        app1.push("latest")
+                    }
+                    echo "push ecr"
+                    docker.withRegistry("https://${ECR_REGISTRY}", 'ecr:ap-northeast-2:aws-cred') {            
+                        app2.push(IMAGE_VERSION)
+                        app2.push("latest")
+                    }
+                }
+            }
+        }
+    }
+}
