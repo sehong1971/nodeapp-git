@@ -1,6 +1,6 @@
 def IMAGE_VERSION
 def ECR_REGISTRY = "242337484181.dkr.ecr.ap-northeast-2.amazonaws.com"
-def ECR_REPO = "${ECR_REGISTRY}/nodeapp00"
+def ECR_REPO = "${ECR_REGISTRY}/nodeapp05"
 
 pipeline {
 	agent any
