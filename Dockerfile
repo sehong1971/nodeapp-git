@@ -1,4 +1,4 @@
-#1.2.0
+#1.3.0
 FROM node:22
 WORKDIR /usr/src/app
 COPY package*.json ./
